@@ -2,8 +2,12 @@ import { createClient } from '@supabase/supabase-js';
 import { test } from 'node:test';
 import assert from 'node:assert';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-dotenv.config({ path: '/root' });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
