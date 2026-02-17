@@ -1,0 +1,33 @@
+{
+  "name": "@tracktime/database",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Database utilities and Supabase client for TrackTime",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./src/index.ts"
+    }
+  },
+  "types": "dist/index.d.ts",
+  "main": "src/index.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.3",
+    "@tracktime/types": "*",
+    "dotenv": "^17.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3"
+  }
+}

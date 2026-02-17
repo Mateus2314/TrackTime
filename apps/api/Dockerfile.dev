@@ -1,0 +1,21 @@
+# Use Node.js LTS
+FROM node:20-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Copy workspace manifests first for better build cache
+COPY package.json package-lock.json ./
+COPY tsconfig.base.json tsconfig.json ./
+COPY apps ./apps
+COPY packages ./packages
+
+# Install dependencies for development (workspace-aware)
+RUN npm install
+
+# Expose API port
+EXPOSE 3001
+
+# Start development server with hot reload
+WORKDIR /app/apps/api
+CMD ["npm", "run", "dev"]

@@ -1,0 +1,402 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-02-15T00:00:00.000Z",
+  "__export_source": "insomnia.rest",
+  "resources": [
+    {
+      "_id": "wrk_tracktime",
+      "_type": "workspace",
+      "name": "TrackTime API",
+      "description": "Multi-tenant time tracking application - Phase 1 (Authentication)"
+    },
+    {
+      "_id": "env_dev",
+      "_type": "environment",
+      "parentId": "wrk_tracktime",
+      "name": "Development",
+      "data": {
+        "api_base_url": "http://localhost:3001",
+        "access_token": "",
+        "refresh_token": "",
+        "company_id": "",
+        "test_email": "test@example.com",
+        "test_password": "TestPass123",
+        "new_user_email": "newuser@tracktime.com",
+        "new_user_password": "SecurePass123"
+      }
+    },
+    {
+      "_id": "fld_health",
+      "_type": "request_group",
+      "parentId": "wrk_tracktime",
+      "name": "Health Checks"
+    },
+    {
+      "_id": "req_health_api",
+      "_type": "request",
+      "parentId": "fld_health",
+      "name": "API Health Check",
+      "method": "GET",
+      "url": "{{ api_base_url }}/health",
+      "headers": []
+    },
+    {
+      "_id": "req_root_api",
+      "_type": "request",
+      "parentId": "fld_health",
+      "name": "API Root Info",
+      "method": "GET",
+      "url": "{{ api_base_url }}/",
+      "headers": []
+    },
+    {
+      "_id": "fld_auth",
+      "_type": "request_group",
+      "parentId": "wrk_tracktime",
+      "name": "Authentication - Fase 1"
+    },
+    {
+      "_id": "fld_auth_register",
+      "_type": "request_group",
+      "parentId": "fld_auth",
+      "name": "Register Endpoint"
+    },
+    {
+      "_id": "req_register_success",
+      "_type": "request",
+      "parentId": "fld_auth_register",
+      "name": "OK - Valid Registration",
+      "method": "POST",
+      "url": "{{ api_base_url }}/api/auth/register",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ new_user_email }}\",\n  \"password\": \"{{ new_user_password }}\",\n  \"fullName\": \"Test User Full Name\",\n  \"phone\": \"+5511999999999\",\n  \"companyName\": \"TrackTime Test Company\",\n  \"companySlug\": \"tracktime-test\"\n}"
+      }
+    },
+    {
+      "_id": "req_register_invalid_email",
+      "_type": "request",
+      "parentId": "fld_auth_register",
+      "name": "ERR - Invalid Email Format",
+      "method": "POST",
+      "url": "{{ api_base_url }}/api/auth/register",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"not-an-email\",\n  \"password\": \"{{ new_user_password }}\",\n  \"fullName\": \"Test User\"\n}"
+      }
+    },
+    {
+      "_id": "req_register_weak_pass_lowercase",
+      "_type": "request",
+      "parentId": "fld_auth_register",
+      "name": "ERR - Weak Password (No Uppercase)",
+      "method": "POST",
+      "url": "{{ api_base_url }}/api/auth/register",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"test@tracktime.com\",\n  \"password\": \"weakpass123\",\n  \"fullName\": \"Test User\"\n}"
+      }
+    },
+    {
+      "_id": "req_register_weak_pass_number",
+      "_type": "request",
+      "parentId": "fld_auth_register",
+      "name": "ERR - Weak Password (No Number)",
+      "method": "POST",
+      "url": "{{ api_base_url }}/api/auth/register",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"test@tracktime.com\",\n  \"password\": \"WeakPass\",\n  \"fullName\": \"Test User\"\n}"
+      }
+    },
+    {
+      "_id": "req_register_short_password",
+      "_type": "request",
+      "parentId": "fld_auth_register",
+      "name": "ERR - Weak Password (Too Short)",
+      "method": "POST",
+      "url": "{{ api_base_url }}/api/auth/register",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"test@tracktime.com\",\n  \"password\": \"Pass1\",\n  \"fullName\": \"Test User\"\n}"
+      }
+    },
+    {
+      "_id": "req_register_missing_fullname",
+      "_type": "request",
+      "parentId": "fld_auth_register",
+      "name": "ERR - Missing Required Field (fullName)",
+      "method": "POST",
+      "url": "{{ api_base_url }}/api/auth/register",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"test@tracktime.com\",\n  \"password\": \"{{ new_user_password }}\"\n}"
+      }
+    },
+    {
+      "_id": "req_register_missing_password",
+      "_type": "request",
+      "parentId": "fld_auth_register",
+      "name": "ERR - Missing Required Field (password)",
+      "method": "POST",
+      "url": "{{ api_base_url }}/api/auth/register",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"test@tracktime.com\",\n  \"fullName\": \"Test User\"\n}"
+      }
+    },
+    {
+      "_id": "fld_auth_login",
+      "_type": "request_group",
+      "parentId": "fld_auth",
+      "name": "Login Endpoint"
+    },
+    {
+      "_id": "req_login_success",
+      "_type": "request",
+      "parentId": "fld_auth_login",
+      "name": "OK - Valid Login",
+      "method": "POST",
+      "url": "{{ api_base_url }}/api/auth/login",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ test_email }}\",\n  \"password\": \"{{ test_password }}\"\n}"
+      }
+    },
+    {
+      "_id": "req_login_invalid_password",
+      "_type": "request",
+      "parentId": "fld_auth_login",
+      "name": "ERR - Invalid Password",
+      "method": "POST",
+      "url": "{{ api_base_url }}/api/auth/login",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ test_email }}\",\n  \"password\": \"WrongPassword123\"\n}"
+      }
+    },
+    {
+      "_id": "req_login_nonexistent",
+      "_type": "request",
+      "parentId": "fld_auth_login",
+      "name": "ERR - Non-existent User",
+      "method": "POST",
+      "url": "{{ api_base_url }}/api/auth/login",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"nonexistent@example.com\",\n  \"password\": \"AnyPassword123\"\n}"
+      }
+    },
+    {
+      "_id": "req_login_invalid_email",
+      "_type": "request",
+      "parentId": "fld_auth_login",
+      "name": "ERR - Invalid Email Format",
+      "method": "POST",
+      "url": "{{ api_base_url }}/api/auth/login",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"not-an-email\",\n  \"password\": \"{{ test_password }}\"\n}"
+      }
+    },
+    {
+      "_id": "req_login_missing_password",
+      "_type": "request",
+      "parentId": "fld_auth_login",
+      "name": "ERR - Missing Password Field",
+      "method": "POST",
+      "url": "{{ api_base_url }}/api/auth/login",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ test_email }}\"\n}"
+      }
+    },
+    {
+      "_id": "fld_auth_refresh",
+      "_type": "request_group",
+      "parentId": "fld_auth",
+      "name": "Refresh Token Endpoint"
+    },
+    {
+      "_id": "req_refresh_success",
+      "_type": "request",
+      "parentId": "fld_auth_refresh",
+      "name": "OK - Valid Refresh Token",
+      "method": "POST",
+      "url": "{{ api_base_url }}/api/auth/refresh",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"refreshToken\": \"{{ refresh_token }}\"\n}"
+      }
+    },
+    {
+      "_id": "req_refresh_invalid",
+      "_type": "request",
+      "parentId": "fld_auth_refresh",
+      "name": "ERR - Invalid/Expired Token",
+      "method": "POST",
+      "url": "{{ api_base_url }}/api/auth/refresh",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"refreshToken\": \"invalid.expired.token.abc123\"\n}"
+      }
+    },
+    {
+      "_id": "fld_auth_me",
+      "_type": "request_group",
+      "parentId": "fld_auth",
+      "name": "Get Current User (Me) Endpoint"
+    },
+    {
+      "_id": "req_me_success",
+      "_type": "request",
+      "parentId": "fld_auth_me",
+      "name": "OK - Get Current User (Valid Token)",
+      "method": "GET",
+      "url": "{{ api_base_url }}/api/auth/me",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_me_no_token",
+      "_type": "request",
+      "parentId": "fld_auth_me",
+      "name": "ERR - No Authorization Header",
+      "method": "GET",
+      "url": "{{ api_base_url }}/api/auth/me",
+      "headers": []
+    },
+    {
+      "_id": "req_me_invalid_token",
+      "_type": "request",
+      "parentId": "fld_auth_me",
+      "name": "ERR - Invalid Token",
+      "method": "GET",
+      "url": "{{ api_base_url }}/api/auth/me",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer invalid.token.xyz789"
+        }
+      ]
+    },
+    {
+      "_id": "fld_auth_logout",
+      "_type": "request_group",
+      "parentId": "fld_auth",
+      "name": "Logout Endpoint"
+    },
+    {
+      "_id": "req_logout_success",
+      "_type": "request",
+      "parentId": "fld_auth_logout",
+      "name": "OK - Logout (Valid Token)",
+      "method": "POST",
+      "url": "{{ api_base_url }}/api/auth/logout",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_logout_no_token",
+      "_type": "request",
+      "parentId": "fld_auth_logout",
+      "name": "ERR - Logout (No Token)",
+      "method": "POST",
+      "url": "{{ api_base_url }}/api/auth/logout",
+      "headers": []
+    }
+  ]
+}

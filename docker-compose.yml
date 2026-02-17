@@ -1,0 +1,114 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: tracktime-postgres
+    restart: unless-stopped
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-tracktime}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - tracktime-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Supabase Studio (local development UI)
+  supabase-studio:
+    image: supabase/studio:latest
+    container_name: tracktime-supabase-studio
+    restart: unless-stopped
+    ports:
+      - '54323:3000'
+    environment:
+      SUPABASE_URL: http://localhost:54321
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+      STUDIO_PG_META_URL: http://postgres:5432
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - tracktime-network
+
+  # Supabase API (optional - can use cloud Supabase)
+  # Uncomment if you want full local Supabase stack
+  # supabase-kong:
+  #   image: kong:2.8-alpine
+  #   container_name: tracktime-kong
+  #   restart: unless-stopped
+  #   ports:
+  #     - '54321:8000'
+  #     - '54322:8443'
+  #   environment:
+  #     KONG_DATABASE: 'off'
+  #     KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
+  #   volumes:
+  #     - ./docker/kong/kong.yml:/var/lib/kong/kong.yml
+  #   networks:
+  #     - tracktime-network
+
+  # Redis for caching and queue management
+  redis:
+    image: redis:7-alpine
+    container_name: tracktime-redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    networks:
+      - tracktime-network
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API (Node.js)
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile.dev
+    container_name: tracktime-api
+    restart: unless-stopped
+    ports:
+      - '3001:3001'
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-tracktime}
+      REDIS_URL: redis://redis:6379
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+      SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_KEY}
+      JWT_SECRET: ${JWT_SECRET}
+    volumes:
+      - ./apps/api:/app/apps/api
+      - ./packages:/app/packages
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - tracktime-network
+    command: npm run dev --workspace @tracktime/api
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  tracktime-network:
+    driver: bridge
